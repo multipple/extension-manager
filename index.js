@@ -453,7 +453,7 @@ export const load = async accountType => {
   GState.set( 'activeExtensions', uiStore.get( storeAttr ) || {} )
 
   // Fetch all installed extensions
-  const list = await fetchExt()
+  const list = await fetch()
   
   if( !isEmpty( list ) )
     list.map( ({ extensionId, ...rest }) => window.Extensions.register({ id: extensionId, ...rest }) )
