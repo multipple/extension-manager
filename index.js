@@ -145,11 +145,9 @@ async function assignDependencies( extension ){
   for( const x in deps ){
     let plugin = await getPlugin( deps[x] )
     // No found
-    if( !plugin ) throw new Error(`<${deps[x]}> not found`)
+    if( !plugin ) 
+      throw new Error(`<${deps[x]}> not found`)
     
-    // Already installed
-    if( __EXTNS__[`${plugin.nsi}~${plugin.version}`] ) continue
-
     // Also assign required plugin dependencies to this plugin if there is
     plugin = await assignDependencies( plugin )
     
