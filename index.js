@@ -23,6 +23,36 @@ function getFavicon( dataset ){
 	return `${window.marketplace}/${namespace}/${nsi}~${version}/${favicon}`
 }
 
+function throwAlert( type, extname, options ){
+
+  switch( type ){
+    case 'EXTENSION_EXIST': if( !options )
+                              options = {
+                                status: 'Info',
+                                message: `<span class="text-primary">${extname}</span> application is already installed in your workspace.`,
+                                actions: false
+                              }; break
+
+    case 'EXTENSION_NOT_FOUND': if( !options )
+                                  options = {
+                                    status: 'Alert',
+                                    message: `<span class="text-primary">${extname}</span> application is not available in your workspace. Install it from the marketplace to continue.`,
+                                    actions: {
+                                      passive: {
+                                        label: 'Go to Marketplace',
+                                        gstate: {
+                                          target: 'marketplace',
+                                          call: 'open',
+                                          arguments: [{ open: { name: extname } }] 
+                                        }
+                                      }
+                                    }
+                                  }; break
+    }
+
+  options && GState.global.alert( options )
+}
+
 function runExt( id, payload ){
   const 
   actives = GState.get('activeExtensions'),
@@ -240,9 +270,8 @@ window.Extensions = {
   run: ( name, payload ) => {
 
     if( !window.Extensions.list.hasOwnProperty( name ) ){
-
-      // TODO: Throw no found extension dialog
-
+      // Throw no found extension dialog
+      throwAlert( 'EXTENSION_NOT_FOUND', name )
       return false
     }
     
@@ -253,9 +282,8 @@ window.Extensions = {
   quit: name => {
 
     if( !window.Extensions.list.hasOwnProperty( name ) ){
-
-      // TODO: Throw no found extension dialog
-
+      // Throw no found extension dialog
+      throwAlert( 'EXTENSION_NOT_FOUND', name )
       return false
     }
 
@@ -292,20 +320,19 @@ window.Extensions = {
     }
 
     // Workspace alert message
-    GState.global.alert({
+    throwAlert( 'EXTENSION_NOT_FOUND', query, {
       status: 'Alert',
       message: `The Extension <span class="text-primary">${query}</span> is not available in your workspace. ${byAccount}.`,
       actions
-    })
+    } )
   },
 
   install: async extension => {
     
     if( !isExtension( extension ) ) return
     if( window.Extensions.list.hasOwnProperty( extension.name ) ){
-
-      // TODO: Throw extension already exist dialog
-
+      // Throw extension already exist dialog
+      throwAlert( 'EXTENSION_EXIST', extension.name )
       return false
     }
 
